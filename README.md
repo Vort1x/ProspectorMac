@@ -70,5 +70,6 @@ Sites/                   # sites générés (non versionné, voir .gitignore)
 
 ## Sécurité
 
-⚠️ La clé API FreeLLMAPI est codée en dur dans `Sources/ProspectorMac.swift`.
-Gardez ce dépôt **privé**.
+⚠️ La clé API FreeLLMAPI se saisit dans les **Réglages** de l'app
+(elle est conservée localement dans `UserDefaults`, jamais dans le code).
+Gardez ce dépôt **privé** par précaution.

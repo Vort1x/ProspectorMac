@@ -29,8 +29,7 @@ echo "--> Installing Playwright browser binaries (chromium)..."
 npx playwright install chromium
 
 echo "--> Testing connection to FreeLLMAPI at http://127.0.0.1:31415/v1..."
-API_KEY="__CLE_SUPPRIMEE__"
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${API_KEY}" http://127.0.0.1:31415/v1/models || true)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:31415/v1/models || true)
 
 if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 401 ] || [ "$HTTP_STATUS" -eq 404 ]; then
     echo "--> FreeLLMAPI host reachable at http://127.0.0.1:31415/v1 (Status: ${HTTP_STATUS})"

@@ -190,7 +190,12 @@ struct WebsiteAudit: Codable {
 @MainActor final class AppState: ObservableObject {
     @Published var isLoading = false
     @Published var connectionStatus: ConnectionStatus = .unknown
-    @Published var apiKey = "__CLE_SUPPRIMEE__"
+    @Published var apiKey = "" {
+        didSet {
+            // La clé saisie dans Réglages persiste entre les lancements.
+            UserDefaults.standard.set(apiKey, forKey: Self.apiKeyKey)
+        }
+    }
     @Published var radius: Double = 10.0
     @Published var filterStatus: ProspectStatus = .all
     @Published var selectedModel: String = "auto"
@@ -198,8 +203,11 @@ struct WebsiteAudit: Codable {
     @Published var userProfile = UserProfile()
     @Published var showingOnboarding = false
     private let profileKey = "prospector.userProfile"
+    private static let apiKeyKey = "prospector.apiKey"
 
     init() {
+        // Plus AUCUNE clé en dur : on recharge celle saisie dans Réglages.
+        apiKey = UserDefaults.standard.string(forKey: Self.apiKeyKey) ?? ""
         if let data = UserDefaults.standard.data(forKey: profileKey),
            let saved = try? JSONDecoder().decode(UserProfile.self, from: data) {
             userProfile = saved
@@ -2555,7 +2563,7 @@ struct SettingsView: View {
     @EnvironmentObject var aiService: AIService
     @Environment(\.dismiss) private var dismiss
 
-    @State private var apiKey = "__CLE_SUPPRIMEE__"
+    @State private var apiKey = ""
     @State private var selectedModel = "auto"
     @State private var profileName = ""
     @State private var profilePhone = ""
