@@ -1,0 +1,18 @@
+{
+  "api": "1.0.0",
+  "name": "ProspectorMaquette",
+  "id": "prospector-maquette-generator",
+  "editorType": ["figma", "figjam"],
+  "menu": [
+    {
+      "name": "Générer depuis Prospector",
+      "menuItem": [
+        {
+          "name": "Importer JSON et créer la maquette",
+          "command": "import_json"
+        }
+      ]
+    }
+  ],
+  "permissions": ["currentuser"]
+}

@@ -1,0 +1,7 @@
+.build/
+ProspectorMac.app/
+scraper-engine/node_modules/
+Sites/
+*.log
+.DS_Store
+.freebuff/

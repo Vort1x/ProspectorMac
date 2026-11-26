@@ -1,0 +1,23 @@
+{
+  "name": "prospector-scraper-engine",
+  "version": "1.0.0",
+  "description": "Scraping engine for ProspectorMac using Playwright",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node src/test-server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "playwright": "^1.47.0"
+  },
+  "keywords": [
+    "scraper",
+    "playwright",
+    "prospector"
+  ],
+  "license": "MIT"
+}
