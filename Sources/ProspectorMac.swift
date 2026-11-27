@@ -2043,16 +2043,21 @@ struct ProspectDetailView: View {
                                     }
                                     .disabled(isGeneratingEmail)
                                     if let mailto = mailtoURL(subject: subject, body: body) {
-                                        Link("Envoyer", destination: mailto)
-                                            .buttonStyle(.borderedProminent)
-                                            .tint(.blue)
-                                            .help("Ouvrir votre messagerie avec l'email du commerçant et l'objet déjà remplis")
+                                        Button("Envoyer") {
+                                            if !NSWorkspace.shared.open(mailto) {
+                                                copyToClipboard("\(subject)\n\n\(body)")
+                                                emailError = "Aucune messagerie configurée pour ouvrir ce lien (\(mailRecipient)). L'email a été copié : collez-le dans votre webmail."
+                                            }
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .tint(.blue)
+                                        .help("Ouvrir votre messagerie vers \(mailRecipient) avec l'objet déjà rempli")
                                     } else {
                                         Button("Envoyer") {}
                                             .buttonStyle(.borderedProminent)
                                             .tint(.blue)
                                             .disabled(true)
-                                            .help("Ajoutez l'email du commerçant dans Coordonnées pour activer l'envoi")
+                                            .help("Ajoutez un vrai email du commerçant (avec @) dans Coordonnées pour activer l'envoi")
                                     }
                                     if isGeneratingEmail { ProgressView().scaleEffect(0.7) }
                                 }
@@ -2250,9 +2255,12 @@ struct ProspectDetailView: View {
     }
 
     /// Construit un lien mailto: avec objet personnalisé — jamais vide.
+    /// URLComponents s'occupe de l'encodage (&, retours ligne, accents) :
+    /// l'ancien encodage manuel laissait des & non échappés et rendait le lien inouvrable.
     private func mailtoURL(subject: String, body: String) -> URL? {
         let to = mailRecipient
-        guard !to.isEmpty else { return nil }
+        // Exige un email plausible : sinon le lien mailto: est invalide et le clic ne fait rien.
+        guard to.contains("@"), to.contains(".") else { return nil }
         var finalSubject = subject.trimmingCharacters(in: .whitespacesAndNewlines)
         if finalSubject.isEmpty {
             let name = liveProspect.name ?? "votre établissement"
@@ -2265,12 +2273,14 @@ struct ProspectDetailView: View {
             let sender = appState.userProfile.name.isEmpty ? "" : "\n\n— \(appState.userProfile.name)"
             finalBody = "Bonjour,\n\nJe me permets de vous contacter au sujet de \(name)\(city.isEmpty ? "" : " (\(city))") : j'ai préparé une maquette moderne pour votre activité.\n\nPouvons-nous en discuter cette semaine ?\(sender)"
         }
-        let enc = CharacterSet.urlQueryAllowed
-        guard
-            let s = finalSubject.addingPercentEncoding(withAllowedCharacters: enc),
-            let b = finalBody.addingPercentEncoding(withAllowedCharacters: enc)
-        else { return nil }
-        return URL(string: "mailto:\(to)?subject=\(s)&body=\(b)")
+        var comps = URLComponents()
+        comps.scheme = "mailto"
+        comps.path = to
+        comps.queryItems = [
+            URLQueryItem(name: "subject", value: finalSubject),
+            URLQueryItem(name: "body", value: finalBody)
+        ]
+        return comps.url
     }
 
     private func generateEmail() async {
