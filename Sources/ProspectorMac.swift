@@ -985,15 +985,17 @@ struct ContentView: View {
 
                     Spacer()
 
-                    // Connection status indicator
+                    // Connection status indicator — reflète appState.connectionStatus,
+                    // mis à jour par "Tester la connexion" ET "Sauvegarder et tester".
                     HStack(spacing: 8) {
                         Circle()
-                            .fill(appState.connectionStatus == .connected ? Color.green : Color.red)
+                            .fill(connectionStatusColor)
                             .frame(width: 10, height: 10)
 
                         Text(connectionStatusText)
                             .font(.caption)
                     }
+                    .help(connectionStatusHelp)
                     .onTapGesture {
                         showingSettings = true
                     }
@@ -1205,6 +1207,32 @@ struct ContentView: View {
             return "Erreur"
         case .unknown:
             return "?"
+        }
+    }
+
+    private var connectionStatusColor: Color {
+        switch appState.connectionStatus {
+        case .connected:
+            return .green
+        case .connecting, .unknown:
+            return .orange
+        case .disconnected, .error:
+            return .red
+        }
+    }
+
+    private var connectionStatusHelp: String {
+        switch appState.connectionStatus {
+        case .connected:
+            return "Connecté à FreeLLMAPI — cliquez pour ouvrir les Réglages"
+        case .connecting:
+            return "Test de connexion en cours..."
+        case .unknown:
+            return "Statut inconnu — ouvrez Réglages puis « Tester la connexion »"
+        case .disconnected:
+            return "Déconnecté — ouvrez Réglages, saisissez la clé puis « Sauvegarder et tester »"
+        case .error(let message):
+            return "Erreur de connexion : \(message) — le test manuel des Réglages a peut-être réussi sans mettre à jour ce voyant (corrigé : retestez une fois)"
         }
     }
 
@@ -2646,12 +2674,15 @@ struct SettingsView: View {
                         apiKey = key
                         appState.apiKey = key
                         aiService.setApiKey(key)
+                        appState.connectionStatus = .connecting
                         Task {
                             let connected = await aiService.checkConnection()
                             if connected {
                                 appState.connectionStatus = .connected
+                                connectionResult = "✓ Connecté à FreeLLMAPI"
                             } else {
-                                appState.connectionStatus = .disconnected
+                                appState.connectionStatus = .error("Proxy injoignable ou clé refusée")
+                                connectionResult = "✗ Impossible de se connecter. Vérifiez la clé API."
                             }
                         }
                     }
@@ -2682,10 +2713,14 @@ struct SettingsView: View {
                 testingConnection = false
                 if connected {
                     connectionResult = "✓ Connecté à FreeLLMAPI"
-                    appState.apiKey = apiKey
-                    aiService.setApiKey(apiKey)
+                    // Synchronise la clé + le voyant de la toolbar :
+                    // sans ça, le modal affiche "Connecté" mais la toolbar reste sur "Erreur".
+                    appState.apiKey = key
+                    aiService.setApiKey(key)
+                    appState.connectionStatus = .connected
                 } else {
                     connectionResult = "✗ Impossible de se connecter. Vérifiez la clé API."
+                    appState.connectionStatus = .error("Échec du test manuel — clé ou proxy à vérifier")
                 }
             }
         }
