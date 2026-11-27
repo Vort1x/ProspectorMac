@@ -11,10 +11,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/last-commit/Vort1x/ProspectorMac?label=dernier%20commit&color=green" alt="dernier commit" />
+  <img src="https://img.shields.io/badge/dernier%20commit-novembre%202026-green" alt="dernier commit" />
   <img src="https://img.shields.io/badge/version-1.0-blue" alt="version" />
   <img src="https://img.shields.io/badge/macOS-14%2B-black?logo=apple&logoColor=white" alt="compatibilité macOS 14+" />
-  <img src="https://img.shields.io/github/languages/top/Vort1x/ProspectorMac?label=langage" alt="langage principal" />
+  <img src="https://img.shields.io/badge/langage-Swift%20%7C%20Node.js-555?logo=swift&logoColor=white" alt="langage principal" />
   <img src="https://img.shields.io/badge/Swift-5.9-orange?logo=swift&logoColor=white" alt="Swift 5.9" />
   <img src="https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white" alt="Node.js 18+" />
   <img src="https://img.shields.io/badge/prix-50%E2%82%AC-brightgreen" alt="prix 50€" />
