@@ -20,14 +20,7 @@
   <img src="https://img.shields.io/badge/prix-50%E2%82%AC-brightgreen" alt="prix 50€" />
 </p>
 
-## 👥 Créateurs / Contributeurs
-
-ProspectorMac a été créé par **Marin Babinger** et **Nolan Vauthier**.
-
-| Nom | GitHub | LinkedIn |
-| --- | ------ | -------- |
-| **Marin Babinger** | [@Vort1x](https://github.com/Vort1x) | [marin-babinger](https://www.linkedin.com/in/marin-babinger/) |
-| **Nolan Vauthier** | [@vauthiernolan0-lang](https://github.com/vauthiernolan0-lang) | [nolan-vauthier-314b553ab](https://www.linkedin.com/in/nolan-vauthier-314b553ab/) |
+## 👥 Contributeurs
 
 <p>
   <a href="https://github.com/Vort1x"><img src="https://img.shields.io/badge/GitHub-Vort1x-181717?logo=github&logoColor=white" alt="GitHub Marin" /></a>
