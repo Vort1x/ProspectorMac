@@ -2042,6 +2042,18 @@ struct ProspectDetailView: View {
                                         Task { await generateEmail() }
                                     }
                                     .disabled(isGeneratingEmail)
+                                    if let mailto = mailtoURL(subject: subject, body: body) {
+                                        Link("Envoyer", destination: mailto)
+                                            .buttonStyle(.borderedProminent)
+                                            .tint(.blue)
+                                            .help("Ouvrir votre messagerie avec l'email du commerçant et l'objet déjà remplis")
+                                    } else {
+                                        Button("Envoyer") {}
+                                            .buttonStyle(.borderedProminent)
+                                            .tint(.blue)
+                                            .disabled(true)
+                                            .help("Ajoutez l'email du commerçant dans Coordonnées pour activer l'envoi")
+                                    }
                                     if isGeneratingEmail { ProgressView().scaleEffect(0.7) }
                                 }
                             } else if isGeneratingEmail {
@@ -2228,6 +2240,37 @@ struct ProspectDetailView: View {
     private func copyToClipboard(_ text: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+    }
+
+    /// Destinataire : email trouvé par le scan (ou saisi à la main juste au-dessus).
+    private var mailRecipient: String {
+        let found = (liveProspect.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if !found.isEmpty { return found }
+        return editEmail.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Construit un lien mailto: avec objet personnalisé — jamais vide.
+    private func mailtoURL(subject: String, body: String) -> URL? {
+        let to = mailRecipient
+        guard !to.isEmpty else { return nil }
+        var finalSubject = subject.trimmingCharacters(in: .whitespacesAndNewlines)
+        if finalSubject.isEmpty {
+            let name = liveProspect.name ?? "votre établissement"
+            finalSubject = "Votre visibilité en ligne — \(name)"
+        }
+        var finalBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        if finalBody.isEmpty {
+            let name = liveProspect.name ?? "votre établissement"
+            let city = liveProspect.city ?? ""
+            let sender = appState.userProfile.name.isEmpty ? "" : "\n\n— \(appState.userProfile.name)"
+            finalBody = "Bonjour,\n\nJe me permets de vous contacter au sujet de \(name)\(city.isEmpty ? "" : " (\(city))") : j'ai préparé une maquette moderne pour votre activité.\n\nPouvons-nous en discuter cette semaine ?\(sender)"
+        }
+        let enc = CharacterSet.urlQueryAllowed
+        guard
+            let s = finalSubject.addingPercentEncoding(withAllowedCharacters: enc),
+            let b = finalBody.addingPercentEncoding(withAllowedCharacters: enc)
+        else { return nil }
+        return URL(string: "mailto:\(to)?subject=\(s)&body=\(b)")
     }
 
     private func generateEmail() async {
